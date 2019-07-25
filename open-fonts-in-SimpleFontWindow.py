@@ -4,9 +4,10 @@ from defconAppKit.windows.baseWindow import BaseWindowController
 from lib.doodleDocument import DoodleDocument
 from mojo.UI import OpenGlyphWindow, OpenSpaceCenter, OpenFontInfoSheet
 
+
 class SimpleFontWindow(BaseWindowController):
 
-    def __init__(self, font, firstGlyphToOpen):
+    def __init__(self, font):
 
         self._font = font
 
@@ -23,21 +24,23 @@ class SimpleFontWindow(BaseWindowController):
 
         glyphs = sorted(font.keys())
 
-        self.w.glyphs = List((0, 0, -0, -0), glyphs, doubleClickCallback=self.openGlyph)
+        self.w.glyphs = List((0, 0, -0, -0), glyphs,
+                             doubleClickCallback=self.openGlyph)
 
         toolbarItems = [
-                dict(itemIdentifier="spaceCenter",
-                     label="Space Center",
-                     imageNamed="toolbarSpaceCenterAlternate",
-                     callback=self.openSpaceCenter
-                     ),
-                dict(itemIdentifier="fontInfo",
-                     label="Font Info",
-                     imageNamed="toolbarFontInfo",
-                     callback=self.openFontInfo
-                     )
-                ]
-        self.w.addToolbar(toolbarIdentifier="SimpleToolbar", toolbarItems=toolbarItems)
+            dict(itemIdentifier="spaceCenter",
+                 label="Space Center",
+                 imageNamed="toolbarSpaceCenterAlternate",
+                 callback=self.openSpaceCenter
+                 ),
+            dict(itemIdentifier="fontInfo",
+                 label="Font Info",
+                 imageNamed="toolbarFontInfo",
+                 callback=self.openFontInfo
+                 )
+        ]
+        self.w.addToolbar(toolbarIdentifier="SimpleToolbar",
+                          toolbarItems=toolbarItems)
 
         windowController = self.w.getNSWindowController()
         windowController.setShouldCloseDocument_(True)
@@ -47,8 +50,8 @@ class SimpleFontWindow(BaseWindowController):
 
         self.setUpBaseWindowBehavior()
         self.w.open()
-        
-        self.openFirstGlyph(firstGlyphToOpen)
+
+        self.openFirstGlyph()
 
     def openGlyph(self, sender):
         sel = sender.getSelection()
@@ -73,8 +76,13 @@ class SimpleFontWindow(BaseWindowController):
     def fontChanged(self, notification):
         if self._canUpdateChangeCount:
             self._font.UIdocument().updateChangeCount_(0)
-            
-    def openFirstGlyph(self, glyphName):
+
+    # to make EditThatNextMaster work as needed
+
+    def openFirstGlyph(self):
+
+        glyphName = "A"
+
         if glyphName in font.keys():
             OpenGlyphWindow(self._font[glyphName])
 
@@ -84,4 +92,4 @@ if not isinstance(fonts, list):
     fonts = [fonts]
 
 for font in fonts:
-    SimpleFontWindow(font, "A")
+    SimpleFontWindow(font)
